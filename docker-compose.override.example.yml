@@ -1,0 +1,54 @@
+version: "3"
+services:
+  web:
+    environment:
+      RAILS_ENV: development
+      DATABASE_URL: postgresql://devto:devto@db:5432/devto
+
+  bundle:
+    environment:
+      RAILS_ENV: development
+      DATABASE_URL: postgresql://devto:devto@db:5432/devto
+
+  yarn:
+    environment:
+      RAILS_ENV: development
+      DATABASE_URL: postgresql://devto:devto@db:5432/devto
+
+  webpacker:
+    environment:
+      RAILS_ENV: development
+      DATABASE_URL: postgresql://devto:devto@db:5432/devto
+
+  seed:
+    environment:
+      RAILS_ENV: development
+      DATABASE_URL: postgresql://devto:devto@db:5432/devto
+
+  sidekiq:
+    environment:
+      RAILS_ENV: development
+      DATABASE_URL: postgresql://devto:devto@db:5432/devto
+
+  db:
+    environment:
+      POSTGRES_USER: devto
+      POSTGRES_PASSWORD: devto
+      POSTGRES_DB: devto
+    expose:
+      - 5432
+    volumes:
+      - ./data/db:/var/lib/postgresql/data:delegated
+
+  redis:
+    image: "redis"
+    container_name: dev_redis
+    expose:
+      - 6379
+
+  elasticsearch:
+    volumes:
+      - ./data/es:/usr/share/elasticsearch/data:delegated
+    expose:
+      - 9200
+
