@@ -4,8 +4,8 @@ services:
     build: .
     image: devto-web:latest
     container_name: dev_web
-    ports:
-      - "3000:3000"
+    expose:
+      - 3000
     depends_on:
       - bundle
       - db
@@ -14,7 +14,7 @@ services:
       - yarn
     environment:
       RAILS_ENV: development
-      DATABASE_URL: postgresql://devto:devto@db:5432/PracticalDeveloper_development
+      DATABASE_URL: postgresql://devto:devto@db:5432/devto
       ELASTICSEARCH_URL: http://elasticsearch:9200
       REDIS_URL: redis://redis:6379
       REDIS_SESSIONS_URL: redis://redis:6379
@@ -33,7 +33,7 @@ services:
     environment:
       RAILS_ENV: development
       REDIS_SIDEKIQ_URL: redis://redis:6379
-      DATABASE_URL: postgresql://devto:devto@db:5432/PracticalDeveloper_development
+      DATABASE_URL: postgresql://devto:devto@db:5432/devto
       ELASTICSEARCH_URL: http://elasticsearch:9200
     volumes:
       - .:/opt/apps/devto:delegated
@@ -47,7 +47,7 @@ services:
     environment:
       RAILS_ENV: development
       REDIS_SIDEKIQ_URL: redis://redis:6379
-      DATABASE_URL: postgresql://devto:devto@db:5432/PracticalDeveloper_development
+      DATABASE_URL: postgresql://devto:devto@db:5432/devto
       ELASTICSEARCH_URL: http://elasticsearch:9200
     volumes:
       - .:/opt/apps/devto:delegated
@@ -63,7 +63,7 @@ services:
     environment:
       RAILS_ENV: development
       REDIS_SIDEKIQ_URL: redis://redis:6379
-      DATABASE_URL: postgresql://devto:devto@db:5432/PracticalDeveloper_development
+      DATABASE_URL: postgresql://devto:devto@db:5432/devto
       ELASTICSEARCH_URL: http://elasticsearch:9200
     volumes:
       - .:/opt/apps/devto:delegated
@@ -84,7 +84,7 @@ services:
       REDIS_SIDEKIQ_URL: redis://redis:6379
       REDIS_URL: redis://redis:6379
       REDIS_SESSIONS_URL: redis://redis:6379
-      DATABASE_URL: postgresql://devto:devto@db:5432/PracticalDeveloper_development
+      DATABASE_URL: postgresql://devto:devto@db:5432/devto
       ELASTICSEARCH_URL: http://elasticsearch:9200
     volumes:
       - .:/opt/apps/devto:delegated
@@ -103,7 +103,7 @@ services:
     environment:
       RAILS_ENV: development
       REDIS_SIDEKIQ_URL: redis://redis:6379
-      DATABASE_URL: postgresql://devto:devto@db:5432/PracticalDeveloper_development
+      DATABASE_URL: postgresql://devto:devto@db:5432/devto
       ELASTICSEARCH_URL: http://elasticsearch:9200
     volumes:
       - .:/opt/apps/devto:delegated
@@ -117,17 +117,17 @@ services:
     environment:
       POSTGRES_USER: devto
       POSTGRES_PASSWORD: devto
-      POSTGRES_DB: PracticalDeveloper_development
-    ports:
-      - "5432:5432"
+      POSTGRES_DB: devto
+    expose:
+      - 5432
     volumes:
       - db_data:/var/lib/postgresql/data:delegated
 
   redis:
     image: "redis"
     container_name: dev_redis
-    ports:
-      - "6379:6379"
+    expose:
+      - 6379
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.5.2
@@ -143,8 +143,8 @@ services:
       - xpack.watcher.enabled=false
     volumes:
       - es_data:/usr/share/elasticsearch/data:delegated
-    ports:
-      - "9200:9200"
+    expose:
+      - 9200
     ulimits:
       memlock:
         soft: -1
