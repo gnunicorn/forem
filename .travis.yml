@@ -8,7 +8,7 @@ cache:
 rvm:
   - 2.7.1
 addons:
-  ssh_known_hosts: 'hts.radikal.jetzt'
+  ssh_known_hosts: 'gnunicorn.org'
   postgresql: '10' # Travis does not work out of the box with Postgres 11 yet
   chrome: 'stable'
   artifacts:
@@ -21,7 +21,6 @@ services:
 env:
   global:
     - RAILS_ENV=test
-    - CC_TEST_REPORTER_ID=f39e060a8b1a558ebd8aff75d5b9760bf1ae98f3f85d628ae28814f3c66438cd
     - DATABASE_URL=postgres://postgres@localhost/
     # Dummy values needed to verify the app boots via "rails runner"
     - APP_PROTOCOL=http://
@@ -34,14 +33,6 @@ env:
     - SECRET_KEY_BASE=dummydummydummy
     - GITHUB_KEY=dummy
     - GITHUB_SECRET=dummy
-    - KNAPSACK_PRO_FIXED_QUEUE_SPLIT=true
-    - KNAPSACK_PRO_LOG_LEVEL=info
-    - KNAPSACK_PRO_CI_NODE_TOTAL=3
-    - COVERAGE_REPORTS_TOTAL=4
-  jobs:
-    - KNAPSACK_PRO_CI_NODE_INDEX=0
-    - KNAPSACK_PRO_CI_NODE_INDEX=1
-    - KNAPSACK_PRO_CI_NODE_INDEX=2
 branches:
   only:
     - sub-production
@@ -56,21 +47,16 @@ script:
   - echo -e '-XX:+DisableExplicitGC\n-Djdk.io.permissionsUseCanonicalPath=true\n-Dlog4j.skipJansi=true\n-server\n' | sudo tee -a /etc/elasticsearch/jvm.options
   - sudo chown -R elasticsearch:elasticsearch /etc/default/elasticsearch
   - sudo systemctl start elasticsearch
-  - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
-  - chmod +x ./cc-test-reporter
   - bundle config set path 'vendor/bundle'
   - bundle install --local --jobs=2
   - yarn install --frozen-lockfile
   - bundle exec rails db:create
   - bundle exec rails webpacker:compile
   - bundle exec rails db:schema:load
-  - './cc-test-reporter before-build'
-  - if [ "$KNAPSACK_PRO_CI_NODE_INDEX" == "0" ]; then yarn test --colors; fi
-  - if [ "$KNAPSACK_PRO_CI_NODE_INDEX" == "0" ]; then ./cc-test-reporter format-coverage -t lcov -o coverage/codeclimate.lcov.json; fi
-  - if [ "$KNAPSACK_PRO_CI_NODE_INDEX" == "1" ]; then bundle exec bundle-audit check --update --ignore CVE-2015-9284; fi
-  - if [ "$KNAPSACK_PRO_CI_NODE_INDEX" == "1" ]; then yarn build-storybook; fi
-  - if [ "$KNAPSACK_PRO_CI_NODE_INDEX" == "2" ]; then bin/test-console-check; fi
-  - 'bin/knapsack_pro_rspec'
+  - yarn test --colors
+  - bundle exec bundle-audit check --update --ignore CVE-2015-9284
+  - yarn build-storybook
+  - bin/test-console-check
   - '[ ! -f .approvals ] || bundle exec approvals verify --ask false'
 # after_script:
 #   - ./cc-test-reporter format-coverage -t simplecov -o ./coverage/codeclimate.$KNAPSACK_PRO_CI_NODE_INDEX.json ./coverage/spec/.resultset.json
